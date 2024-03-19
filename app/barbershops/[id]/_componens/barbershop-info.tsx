@@ -6,11 +6,11 @@ import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface BarbershopInfoPros {
+interface BarbershopInfoProps {
   barbershop: Barbershop;
 }
 
-const BarbershopInfo = ({ barbershop }: BarbershopInfoPros) => {
+const BarbershopInfo = ({ barbershop }: BarbershopInfoProps) => {
   const router = useRouter();
 
   const handleBackClick = () => {
