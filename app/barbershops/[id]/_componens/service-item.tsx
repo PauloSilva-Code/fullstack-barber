@@ -12,14 +12,16 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { Barbershop, Service } from "@prisma/client";
+import { format, setHours, setMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Loader } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { generateDayTimeList } from "../_helpers/hours";
-import { format, setHours, setMinutes } from "date-fns";
+import { toast } from "sonner";
 import SaveBooking from "../_actions/save-booking";
-import { Loader } from "lucide-react";
+import { generateDayTimeList } from "../_helpers/hours";
 
 interface ServiceItemProps {
   barbershop: Barbershop;
@@ -32,11 +34,14 @@ const ServiceItem = ({
   service,
   isAuthenticated,
 }: ServiceItemProps) => {
+  const router = useRouter();
+
   const { data } = useSession();
 
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
   const [submitIsLoading, setSubmitIstLoading] = useState(false);
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
   const handleHourClick = (time: string) => {
     setHour(time);
@@ -70,6 +75,20 @@ const ServiceItem = ({
         serviceId: service.id,
         date: newDate,
         userId: (data.user as any).id,
+      });
+
+      setSheetIsOpen(false);
+      setDate(undefined);
+      setHour(undefined);
+
+      toast("Reserva realizada com sucesso!", {
+        description: format(newDate, "'Para' dd 'de' MMMM 'às' HH':'mm'.' ", {
+          locale: ptBR,
+        }),
+        action: {
+          label: "Visualizar",
+          onClick: () => router.push("/bookings"),
+        },
       });
     } catch (error) {
       console.log(error);
@@ -108,7 +127,7 @@ const ServiceItem = ({
                 }).format(Number(service.price || 0.0))}
               </p>
 
-              <Sheet>
+              <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
                 <SheetTrigger asChild>
                   <Button variant="secondary" onClick={handleReserveClick}>
                     Reservar
