@@ -1,14 +1,36 @@
-import Header from "./_components/header";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import Search from "./_components/search";
-import BookingItem from "./_components/booking-item";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import { db } from "../lib/prisma";
 import BarbershopItem from "./_components/barbershop-item";
+import BookingItem from "./_components/booking-item";
+import Header from "./_components/header";
+import Search from "./_components/search";
 
 export default async function Home() {
-  // chamar prisma e pegar barbearias
-  const barbershops = await db.barbershop.findMany({});
+  // pegando o usuário autenticado
+  const session = await getServerSession(authOptions);
+
+  // pegando os barbeiros e os agendamentos do usuário logado(se ele estiver logado)
+  const [barbershops, confirmedBookings] = await Promise.all([
+    db.barbershop.findMany({}),
+    session?.user
+      ? await db.booking.findMany({
+          where: {
+            userId: (session.user as any).id,
+            date: {
+              gte: new Date(),
+            },
+          },
+          include: {
+            service: true,
+            barbershop: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+
   return (
     <main>
       <Header />
@@ -26,12 +48,16 @@ export default async function Home() {
         <Search />
       </div>
 
-      <div className="px-5 mt-6">
-        <h2 className="text-xs mb-3 uppercase text-gray-400 font-bold">
+      <div className="mt-6">
+        <h2 className="text-xs pl-5  mb-3 uppercase text-gray-400 font-bold">
           Agendamentos
         </h2>
 
-        <BookingItem />
+        <div className="flex gap-3 px-5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          {confirmedBookings.map((booking) => (
+            <BookingItem key={booking.id} booking={booking} />
+          ))}
+        </div>
       </div>
 
       <div className="mt-6">
