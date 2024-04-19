@@ -2,6 +2,17 @@
 
 import { cancelBooking } from "@/app/_actions/cancel-booking";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/components/ui/alert-dialog";
+import {
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -166,17 +177,43 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 Voltar
               </Button>
             </SheetClose>
-            <Button
-              className="w-full"
-              variant="destructive"
-              disabled={!isBookingConfirmed || isDeleteLoading}
-              onClick={handleCancelClick}
-            >
-              {isDeleteLoading && (
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Cancelar reserva
-            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  className="w-full"
+                  variant="destructive"
+                  disabled={!isBookingConfirmed || isDeleteLoading}
+                >
+                  Cancelar reserva
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="w-[90%]">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Deseja cancelar essa reserva?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Uma vez cancelada, não será possível reverter esta ação.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="flex-row gap-3">
+                  <AlertDialogCancel className="w-full mt-0">
+                    Voltar
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className="w-full"
+                    onClick={handleCancelClick}
+                    disabled={isDeleteLoading}
+                  >
+                    {isDeleteLoading && (
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Confirmar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </SheetFooter>
         </div>
       </SheetContent>
