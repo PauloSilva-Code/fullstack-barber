@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import BookingItem from "../(home)/_components/booking-item";
 import Header from "../(home)/_components/header";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../lib/auth";
 import { db } from "../lib/prisma";
 
 const BookingPage = async () => {

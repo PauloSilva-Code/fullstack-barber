@@ -1,8 +1,8 @@
+import { authOptions } from "@/app/lib/auth";
 import { db } from "@/app/lib/prisma";
+import { getServerSession } from "next-auth";
 import BarbershopInfo from "./_componens/barbershop-info";
 import ServiceItem from "./_componens/service-item";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface BarbershopDetailsPage {
   params: {
